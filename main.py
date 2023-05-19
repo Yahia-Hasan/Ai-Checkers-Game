@@ -1,12 +1,14 @@
+
 import pygame
 
 # Import constants and game-related functions from other modules
 from checkers.constants import WIDTH, HEIGHT, RED, WHITE
 from checkers.game import Game
-from minimax.algorithm import minimax,get_all_moves
+from minimax.algorithm import minimax,alpha_beta,get_all_moves
+from winner_gui import display_winner
 
 # Set the frames per second for Pygame window updates
-FPS = 1
+FPS = 50
 
 # Create a Pygame window with specified dimensions
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -21,6 +23,7 @@ def main():
     # Create a new game and store its initial state
     game = Game(WIN)
     new_board = game.get_board()
+    algorithm="minimax"
     level=3
     while run:
         clock.tick(FPS)
@@ -31,14 +34,18 @@ def main():
 
             # Check if there are any valid moves for the AI player
             if not moves:
-                print("no more moves ,WHITE WINS!")
+                display_winner("no more moves ,WHITE WINS!")
                 run = False
 
             # Choose a move using selected algorithm and search depth
             else:
+                if algorithm == "minimax":
                     value, new_board = minimax(game.get_board(), level, WHITE, game)
-                    # Update the game state with the chosen move
-                    game.ai_move(new_board)
+                else:
+                    value, new_board = alpha_beta(game.get_board(), level, float('-inf'), float('inf'), WHITE, game)
+
+                # Update the game state with the chosen move
+                game.ai_move(new_board)
 
         # If it's the human player's turn (red), choose a random move
         else:
@@ -46,7 +53,7 @@ def main():
 
             # Check if there are any valid moves for the human player
             if not moves:
-                print("no moves for red ,WHITE WINS!")
+                display_winner("no moves for red ,WHITE WINS!")
                 run = False
 
             # Choose a random move
@@ -57,9 +64,9 @@ def main():
         if game.winner() is not None:
             # Display winner message and end the game loop
             if(game.winner()==WHITE):
-                print("WHITE WINS!")
+                display_winner("WHITE WINS!")
             else:
-                print("RED WINS!")
+                display_winner("RED WINS!")
             run = False
 
         # Update the Pygame window with the current game state
