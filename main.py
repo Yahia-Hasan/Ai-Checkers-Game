@@ -1,3 +1,4 @@
+import time
 
 import pygame
 
@@ -6,9 +7,11 @@ from checkers.constants import WIDTH, HEIGHT, RED, WHITE
 from checkers.game import Game
 from minimax.algorithm import minimax,alpha_beta,get_all_moves
 from winner_gui import display_winner
+from difficulty_selection_gui import DifficultySelectionGUI
+from algorithm_selection_gui import AlgorithmSelectionGUI
 
 # Set the frames per second for Pygame window updates
-FPS = 50
+FPS = 1
 
 # Create a Pygame window with specified dimensions
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -23,8 +26,28 @@ def main():
     # Create a new game and store its initial state
     game = Game(WIN)
     new_board = game.get_board()
-    algorithm="minimax"
-    level=3
+
+    # Open GUI for selecting AI algorithm
+    gui1 = AlgorithmSelectionGUI()
+    gui1.run()
+    algorithm = gui1.algorithm
+    print("Selected algorithm:", algorithm)
+
+    # Open GUI for selecting difficulty level
+    gui2 = DifficultySelectionGUI()
+    gui2.run()
+    difficulty = gui2.difficulty
+    print("Selected difficulty:", difficulty)
+
+    # Determine search depth based on selected difficulty level
+    if difficulty=="easy":
+        level = 2
+    elif difficulty=="medium":
+        level = 3
+    else:
+        level = 4
+
+    start_time=time.time()
     while run:
         clock.tick(FPS)
 
@@ -34,7 +57,7 @@ def main():
 
             # Check if there are any valid moves for the AI player
             if not moves:
-                display_winner("no more moves ,WHITE WINS!")
+                display_winner("no more moves ,WHITE WINS!",start_time,algorithm)
                 run = False
 
             # Choose a move using selected algorithm and search depth
@@ -53,7 +76,7 @@ def main():
 
             # Check if there are any valid moves for the human player
             if not moves:
-                display_winner("no moves for red ,WHITE WINS!")
+                display_winner("no moves for red ,WHITE WINS!",start_time,algorithm)
                 run = False
 
             # Choose a random move
@@ -64,9 +87,9 @@ def main():
         if game.winner() is not None:
             # Display winner message and end the game loop
             if(game.winner()==WHITE):
-                display_winner("WHITE WINS!")
+                display_winner("WHITE WINS!",start_time,algorithm)
             else:
-                display_winner("RED WINS!")
+                display_winner("RED WINS!",start_time,algorithm)
             run = False
 
         # Update the Pygame window with the current game state
