@@ -3,7 +3,8 @@ import pygame
 # Import constants and game-related functions from other modules
 from checkers.constants import WIDTH, HEIGHT, RED, WHITE
 from checkers.game import Game
-from minimax.algorithm import minimax,get_all_moves
+from minimax.algorithm import minimax,alpha_beta,get_all_moves
+
 
 # Set the frames per second for Pygame window updates
 FPS = 1
@@ -21,7 +22,8 @@ def main():
     # Create a new game and store its initial state
     game = Game(WIN)
     new_board = game.get_board()
-    level=3
+    algorithm="minimax"
+    level = 3
     while run:
         clock.tick(FPS)
 
@@ -36,9 +38,13 @@ def main():
 
             # Choose a move using selected algorithm and search depth
             else:
+                if algorithm == "minimax":
                     value, new_board = minimax(game.get_board(), level, WHITE, game)
-                    # Update the game state with the chosen move
-                    game.ai_move(new_board)
+                else:
+                    value, new_board = alpha_beta(game.get_board(), level, float('-inf'), float('inf'), WHITE, game)
+
+                # Update the game state with the chosen move
+                game.ai_move(new_board)
 
         # If it's the human player's turn (red), choose a random move
         else:
