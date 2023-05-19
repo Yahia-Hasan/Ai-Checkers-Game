@@ -1,6 +1,7 @@
 import random
 
 import pygame
+import minimax.algorithm
 from .constants import RED, WHITE, BLUE, SQUARE_SIZE
 from checkers.board import Board
 
@@ -72,3 +73,18 @@ class Game:
     def ai_move(self, board):
         self.board = board
         self.change_turn()
+
+    def random_move(self, board):
+        if self.turn == WHITE:
+            self.board = board
+            self.change_turn()
+            return
+
+        # get all valid moves for the red player
+        moves = list(minimax.algorithm.get_all_moves(self.board, RED, self))
+
+        # choose a random move
+        if moves:
+            move = random.choice(moves)
+            self.board = move
+            self.change_turn()
